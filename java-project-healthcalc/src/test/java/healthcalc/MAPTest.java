@@ -16,8 +16,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import healthcalc.exceptions.InvalidHealthDataException;
 
 /**
- * Tests para la métrica MAP (Mean Arterial Pressure).
- * Siguiendo la estructura de ejemplos de clase.
+ * Tests for the HealthCalc interface.
+ * 
+ * Use the AAA pattern (Arrange, Act, Assert) for the tests.
+ * 
  */
 @DisplayName("Tests para el cálculo de la Presión Arterial Media (MAP)")
 public class MAPTest {
