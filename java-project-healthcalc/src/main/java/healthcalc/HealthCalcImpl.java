@@ -47,4 +47,23 @@ public class HealthCalcImpl implements HealthCalc {
         return weight / Math.pow(height, 2);
     }
     
+    @Override
+    public double ibw(int height, String gender) throws InvalidHealthDataException {
+        if (height <= 0) {
+            throw new InvalidHealthDataException("Height must be positive.");
+        }
+        if (height < 150 || height > 300) {
+            throw new InvalidHealthDataException("Height must be within a range between 150cm and 300cm.");
+        }
+        if (!"Hombre".equals(gender) && !"Mujer".equals(gender)) {
+            throw new InvalidHealthDataException("Gender must be 'Hombre' or 'Mujer'.");
+        }
+        double weight = 0.0;
+        if ("Hombre".equals(gender)) {
+	        weight = (height - 100) - ((height - 150) / 4.0);
+        } else {
+	        weight = (height - 100) - ((height - 150) / 2.5);
+        }
+        return weight;
+    }
 }

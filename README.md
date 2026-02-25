@@ -238,6 +238,14 @@ Para garantizar que la calculadora sea fiable y segura, se han definido los sigu
     * El sistema debe rechazar alturas menores a 30 cm o mayores a 300 cm.
 * **Protección ante errores de escritura:** Se verifica que no se permitan valores negativos o iguales a cero.
 
+<summary><b>Pruebas de Cálculo del Peso Ideal a través de la fórmula de Lorentz (IBW)</b></summary>
+
+* **Cálculo correcto:** Se comprueba que, al introducir una altura normal y al seleccionar un sexo válido (Hombre o Mujer), el resultado sea el esperado matemáticamente.
+* **Protección ante datos imposibles:**
+    * El sistema debe rechazar alturas menores a 150 cm o mayores a 300 cm.
+    * El sistema debe rechazar un sexo distinto de Hombre o Mujer.
+* **Protección ante errores de escritura:** Se verifica que no se permitan valores negativos, decimales o iguales a cero en la altura. De la misma manera, se verifica que no se permitan valores nulos, incorrectos o vacios en el sexo.
+
 </details>
 
 <details>
