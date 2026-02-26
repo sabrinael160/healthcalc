@@ -252,6 +252,47 @@ Para cada categoría, probamos valores que están justo en el límite para asegu
 
 </details>
 
+### Casos de Prueba - Presión Arterial Media (MAP)
+
+<details>
+<summary><b>Pruebas de Cálculo del MAP</b></summary>
+
+La **Presión Arterial Media (MAP)** representa la presión promedio en las arterias durante un ciclo cardíaco completo. Se calcula mediante la fórmula: $$MAP = \frac{PAS + 2(PAD)}{3}$$
+
+* **Cálculo estándar:**
+    * **Entrada:** Valores en rango fisiológico común (PAS: 100-140, PAD: 60-90).
+    * **Ejemplo:** PAS = 120, PAD = 80.
+    * **Resultado esperado:** 93.33 mmHg.
+* **Entradas de Valores No Válidos:**
+    * **Entrada:** Valores negativos o iguales a cero.
+    * **Ejemplo:** PAS = -120, PAD = 0.
+    * **Resultado esperado:** Excepción/Error (InvalidHealthDataException).
+* **Inconsistencia Biológica:**
+    * **Entrada:** Presión Diastólica mayor o igual a la Sistólica.
+    * **Ejemplo:** PAS = 70, PAD = 110.
+    * **Resultado esperado:** Excepción/Error.
+* **Límites Físicos:**
+    * **Entrada:** Valores que superan los límites de la supervivencia humana.
+    * **Ejemplo:** PAS = 350, PAD = 220.
+    * **Resultado esperado:** Excepción/Error.
+</details>
+
+<details>
+<summary><b>Pruebas de Clasificación del Estado de Perfusión (MAP)</b></summary>
+
+A partir del valor numérico obtenido, el sistema categoriza el estado del paciente:
+
+* **MAP Low (Baja):**
+    * **Rango:** Valores menores a 70 mmHg.
+    * **Resultado esperado:** "Low".
+* **MAP Normal (Saludable):**
+    * **Rango:** Valores entre 70 y 100 mmHg (inclusive).
+    * **Resultado esperado:** "Normal".
+* **MAP High (Alta):**
+    * **Rango:** Valores mayores a 100 mmHg.
+    * **Resultado esperado:** "High".
+</details>
+
 
 ## Instalación y ejecución
 
@@ -305,35 +346,4 @@ Para cada categoría, probamos valores que están justo en el límite para asegu
 
 </details>
 
-### Casos de prueba
 
-Siguiendo una metodología de desarrollo dirigida por los tests (Test Driven Development, TDD), se han definido los escenarios de prueba para las distintas métricas antes de su implementación en el código.
-
-### Casos de Prueba - MAP 
-
-La **Presión Arterial Media (MAP)** representa la presión promedio en las arterias durante un ciclo cardíaco completo. Un valor mínimo de 60-65 mmHg es necesario para mantener un estado saludable.
-
-* **Cálculo estándar:**
-    * **Entrada:** Valores que se encuentran dentro del rango fisiológico común para un adulto. Presión arterial sistólica debe de ser mayor o igual que 100 y menor o igual que 140. La presión diastólica debe de ser mayor o igual a 60 y menor o igual a 90. 
-    * **Ejemplo de prueba:** PAS = 120, PAD = 80.
-    * **Resultado esperado:** Valor numérico exacto aplicando la fórmula $MAP = \frac{PAS + 2(PAD)}{3}$ (en este caso: 93.33 mmHg).
-
-* **Límite de Salud (Crítico):**
-    * **Entrada:** Valores tan bajos que el MAP baja de 60.
-    * **Ejemplo de prueba:** PAS = 80, PAD = 45.
-    * **Resultado esperado:** Valor menor a 60 mmHg, indicando alerta de perfusión insuficiente y estado crítico (en este caso: 56.66 mmHg).
-
-* **Entradas de Valores No Válidos:**
-    * **Entrada:** Valores negativos o iguales a cero.
-    * **Ejemplo de prueba:** PAS = -120, PAD = 0.
-    * **Resultado esperado:** El sistema lanzará una **Excepción / Error**, ya que no existen presiones biológicas nulas o negativas.
-
-* **Inconsistencia Biológica:**
-    * **Entrada:** Presión Diastólica mayor o igual a la Sistólica.
-    * **Ejemplo de prueba:** PAS = 70, PAD = 110.
-    * **Resultado esperado:** **Excepción / Error**. La presión sistólica siempre debe ser superior a la diastólica en un paciente.
-
-* **Límites Físicos:**
-    * **Entrada:** Valores que superan los límites de la supervivencia humana
-    * **Ejemplo de prueba:** PAS = 350, PAD = 220.
-    * **Resultado esperado:** **Excepción / Error**. 

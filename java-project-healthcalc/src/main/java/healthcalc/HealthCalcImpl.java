@@ -49,6 +49,7 @@ public class HealthCalcImpl implements HealthCalc {
     
     @Override
     public float calculateMAP(float pas, float pad) throws InvalidHealthDataException {
+
         if (pas <= 0 || pad <= 0) {
             throw new InvalidHealthDataException("Las presiones no pueden ser cero o negativas.");
         }
@@ -60,5 +61,22 @@ public class HealthCalcImpl implements HealthCalc {
         }
 
         return (pas + 2 * pad) / 3;
+    }
+
+    @Override
+    public String mapClassification(float map) throws InvalidHealthDataException {
+        if (map <= 0) {
+            throw new InvalidHealthDataException("El MAP no puede ser cero o negativo."); //Comprobar que no se pueden clasificar valores de MAP nulos o negativos
+        }
+
+        String result = "High";
+
+        if (map < 70) {
+            result = "Low";
+        } else if (map <= 100) {
+            result = "Normal";
+        }
+
+        return result;
     }
 }

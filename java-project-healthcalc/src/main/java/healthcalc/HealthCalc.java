@@ -35,4 +35,6 @@ public interface HealthCalc {
 	public double bmi(double weight, double height) throws InvalidHealthDataException;
 
 	public float calculateMAP(float pas, float pad) throws InvalidHealthDataException;
+	public String mapClassification(float map) throws InvalidHealthDataException;
+
 }

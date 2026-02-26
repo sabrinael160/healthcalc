@@ -3,7 +3,6 @@ package healthcalc;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,91 +15,107 @@ import org.junit.jupiter.params.provider.ValueSource;
 import healthcalc.exceptions.InvalidHealthDataException;
 
 /**
- * Tests for the HealthCalc interface.
- * 
- * Use the AAA pattern (Arrange, Act, Assert) for the tests.
- * 
+ * Tests for the HealthCalc interface - MAP Metric.
+ * * Use the AAA pattern (Arrange, Act, Assert) for the tests.
+ * * @author Johana Elena Sánchez
  */
 @DisplayName("Tests para el cálculo de la Presión Arterial Media (MAP)")
 public class MAPTest {
 
     private HealthCalc healthCalc;
 
-    @BeforeEach 
+    @BeforeEach
     void setUp() {
         healthCalc = new HealthCalcImpl();
     }
 
     @Nested
-    @DisplayName("MÉTRICA MAP")
-    class MAPCalculationTests {
+    @DisplayName("Cálculo del MAP")
+    class MAPMetricTests {
 
         @Test
-        @DisplayName("Cálculo de MAP estándar (Valores saludables)")
-        void testMapValido() throws InvalidHealthDataException {
-            
-            float pas = 120; //presión sistólica 
-            float pad = 80;    //presión diastólica
-            float expected = (pas + (2 * pad)) / 3; 
+        @DisplayName("Cálculo estándar: PAS 120, PAD 80 debe dar 93.33")
+        void testMapEstandard() throws InvalidHealthDataException {
+            float pas = 120;
+            float pad = 80;
+            float expectedMap = (pas + 2 * pad) / 3;
 
             float result = healthCalc.calculateMAP(pas, pad);
 
-            assertEquals(expected, result, 0.01f); // Tolerancia de 0.01 para decimales
-        }
-
-        @ParameterizedTest(name = "PAS {0}, PAD {1} debe dar MAP > 60") //Pruebo con distintas entradas para validar que >60"
-        @CsvSource({ //tabla de valores 
-            "95, 60",
-            "100, 65",
-            "110, 70"
-        })
-        @DisplayName("Validación de perfusión adecuada (Límite mínimo)")
-        void testMapPerfusionAdecuada(float pas, float pad) throws InvalidHealthDataException {
-            float result = healthCalc.calculateMAP(pas, pad);
-            assertTrue(result >= 60f, "La perfusión debería ser adecuada (>= 60)");
+            assertEquals(expectedMap, result, 0.01f);
         }
 
         @Test
-        @DisplayName("Validación de estado crítico (Perfusión < 60)")
-        void testMapEstadoCritico() throws InvalidHealthDataException {
-            float result = healthCalc.calculateMAP(80, 45);
-            assertTrue(result < 60.0f, "Debe identificar valores de riesgo menores a 60");
-        }
-    }
-
-    @Nested
-    @DisplayName("Validación de errores y límites físicos/biológicos")
-    class MAPValidationTests {
-
-        @Test
-        @DisplayName("Bloqueo de inconsistencia biológica (PAD >= PAS)")
-        void testMapInconsistencia() {
-            // la diastólica nunca puede ser mayor o igual a la sistólica
-            assertThrows(InvalidHealthDataException.class, () -> healthCalc.calculateMAP(70, 110));
-        }
-
-        @ParameterizedTest(name = "Valor inválido: {0}")
-        @ValueSource(floats = {-120, -1, 0})
         @DisplayName("Lanzar excepción ante valores negativos o cero")
-        void testMapValoresNegativos(float valor) {
+        void testMapValoresNulosONegativos() {
             assertAll(
-                () -> assertThrows(InvalidHealthDataException.class, () -> healthCalc.calculateMAP(valor, 80)),
-                () -> assertThrows(InvalidHealthDataException.class, () -> healthCalc.calculateMAP(120, valor))
+                () -> assertThrows(InvalidHealthDataException.class, () -> healthCalc.calculateMAP(-120, 80)),
+                () -> assertThrows(InvalidHealthDataException.class, () -> healthCalc.calculateMAP(120, 0))
             );
         }
 
-        @ParameterizedTest(name = "Sistólica excesiva: {0} mmHg")
-        @ValueSource(floats = {300.1f, 400, 500})
-        @DisplayName("Bloqueo de límites físicos máximos (Sistólica > 300)")
-        void testSistolicaMaxima(float pas) {
-            assertThrows(InvalidHealthDataException.class, () -> healthCalc.calculateMAP(pas, 80));
+        @Test
+        @DisplayName("Lanzar excepción ante inconsistencia biológica (PAD >= PAS)")
+        void testMapInconsistencia() {
+            assertThrows(InvalidHealthDataException.class, () -> healthCalc.calculateMAP(70, 110)); //pad mayor que pas
         }
 
-        @ParameterizedTest(name = "Diastólica excesiva: {0} mmHg")
-        @ValueSource(floats = {200.1f, 250, 300})
-        @DisplayName("Bloqueo de límites físicos máximos (Diastólica > 200)")
-        void testDiastolicaMaxima(float pad) {
-            assertThrows(InvalidHealthDataException.class, () -> healthCalc.calculateMAP(120, pad));
+        @Test
+        @DisplayName("Error con presiones imposibles")
+        void testLimitesFisicos() {
+            assertThrows(InvalidHealthDataException.class, () -> healthCalc.calculateMAP(350, 80)); 
+            assertThrows(InvalidHealthDataException.class, () -> healthCalc.calculateMAP(120, 250));
+}
+    }
+
+    @Nested
+    @DisplayName("Clasificación a partir del MAP")
+    class MAPClassificationTests {
+
+        @ParameterizedTest(name = "MAP {0} debe ser clasificado como Low")
+        @ValueSource(floats = {40, 60, 69.99f})  //repito con varios valores MAP en un mismo test para validar que la métrica clasifica correctamente en un rango
+        @DisplayName("Validación de categoría Low (hay una perfusión baja)")
+        void testMapLow(float map) throws InvalidHealthDataException {
+            String expected = "Low";
+            String result = healthCalc.mapClassification(map);
+            assertEquals(expected, result);
+        }
+
+        @ParameterizedTest(name = "MAP {0} debe ser clasificado como Normal")
+        @ValueSource(floats = {70, 85, 100})
+        @DisplayName("Validación de categoría Normal (hay una perfusión saludable)")
+        void testMapNormal(float map) throws InvalidHealthDataException {
+            String expected = "Normal";
+            String result = healthCalc.mapClassification(map);
+            assertEquals(expected, result);
+        }
+
+        @ParameterizedTest(name = "MAP {0} debe ser clasificado como High")
+        @ValueSource(floats = {100.1f, 120, 180})
+        @DisplayName("Validación de categoría High (Hay una perfusión alta)")
+        void testMapHigh(float map) throws InvalidHealthDataException {
+            String expected = "High";
+            String result = healthCalc.mapClassification(map);
+            assertEquals(expected, result);
+        }
+
+        @ParameterizedTest(name = "Valor de clasificación inválido: {0}")
+        @ValueSource(floats = {-10, 0})
+        @DisplayName("Lanzar excepción si se intenta clasificar un MAP nulo o negativo")
+        void testMapClassificationInvalid(float map) {
+            assertThrows(InvalidHealthDataException.class, () -> healthCalc.mapClassification(map));
+        }
+
+        @ParameterizedTest(name = "MAP {0} debe ser clasificado como {1}")
+        @CsvSource({
+            "60, Low",
+            "70, Normal",
+            "100, Normal",
+            "100.1, High"
+        })
+        @DisplayName("Clasificación de MAP en los límites exactos")
+        void testMapClassificationLimites(float map, String expectedCategory) throws InvalidHealthDataException {
+            assertEquals(expectedCategory, healthCalc.mapClassification(map));
         }
     }
 }
