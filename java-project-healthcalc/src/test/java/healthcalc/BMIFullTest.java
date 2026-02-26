@@ -1,17 +1,19 @@
 package healthcalc;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import healthcalc.exceptions.InvalidHealthDataException;
 
-@DisplayName("Tests BMI versión FULL")
+@DisplayName("Tests para la calculadora de salud- BMI versión FULL.")
 public class BMIFullTest {
     private HealthCalc healthCalc;
 
@@ -21,7 +23,81 @@ public class BMIFullTest {
 	}
 
     @Nested
-    @DisplayName("Clasificación BMI - Versión FULL")
+    @DisplayName("Métrica del BMI")
+    class BMIMetricTests {
+
+        @Test
+        @DisplayName("Cálculo de BMI con valores estándar válidos")
+        void testBmiValido() throws InvalidHealthDataException {
+            double weight = 70.0;
+            double height = 1.75;
+            double expectedBmi = 70.0 / Math.pow(1.75, 2);
+
+            double result = healthCalc.bmi(weight, height);
+
+            assertEquals(expectedBmi, result, 0.01);
+        }
+
+        @Test
+        @DisplayName("Lanzar excepción cuando el peso es cero")
+        void testBmiPesoCero() {
+            assertThrows(InvalidHealthDataException.class, () -> healthCalc.bmi(0, 170));
+        }
+
+        @Test
+        @DisplayName("Lanzar excepción cuando la altura es cero")
+        void testBmiAlturaCero() {
+            assertThrows(InvalidHealthDataException.class, () -> healthCalc.bmi(70, 0));
+        }
+
+        @Test
+        @DisplayName("Lanzar excepción cuando los valores son negativos")
+        void testBmiNegativos() {
+            assertAll(
+                () -> assertThrows(InvalidHealthDataException.class, () -> healthCalc.bmi(-70, 170)),
+                () -> assertThrows(InvalidHealthDataException.class, () -> healthCalc.bmi(70, -170))
+            );
+        }
+
+        @ParameterizedTest(name = "Peso mínimo inválido: {0} kg")
+        @ValueSource(doubles = {-10.0, 0.0, 0.99})
+        @DisplayName("Bloqueo de pesos inferiores al límite biológico mínimo (1 kg)")
+        void testPesoMinimoImposible(double weight) {
+            double height = 170.0;
+            
+            assertThrows(InvalidHealthDataException.class, () -> healthCalc.bmi(weight, height));
+        }
+
+        @ParameterizedTest(name = "Peso máximo inválido: {0} kg")
+        @ValueSource(doubles = {700.1, 1000.0, 5000.0})
+        @DisplayName("Bloqueo de pesos superiores al límite biológico máximo (700 kg)")
+        void testPesoMaximoImposible(double weight) {
+            double height = 170.0;
+            
+            assertThrows(InvalidHealthDataException.class, () -> healthCalc.bmi(weight, height));
+        }
+
+        @ParameterizedTest(name = "Altura mínima inválida: {0} m")
+        @ValueSource(doubles = {-0.50, 0.0, 0.29})
+        @DisplayName("Bloqueo de alturas inferiores al límite biológico mínimo (30 m)")
+        void testAlturaMinimaImposible(double height) {
+            double weight = 70.0;
+            
+            assertThrows(InvalidHealthDataException.class, () -> healthCalc.bmi(weight, height));
+        }
+
+        @ParameterizedTest(name = "Altura máxima inválida: {0} m")
+        @ValueSource(doubles = {3.01, 3.50, 5.00})
+        @DisplayName("Bloqueo de alturas superiores al límite biológico máximo (300 m)")
+        void testAlturaMaximoImposible(double height) {
+            double weight = 70.0;
+            
+            assertThrows(InvalidHealthDataException.class, () -> healthCalc.bmi(weight, height));
+        }
+    }
+
+    @Nested
+    @DisplayName("Clasificación FULL  a partir del BMI")
     class BMIClassificationFullTests {
         @ParameterizedTest(name = "BMI {0} debe ser clasificado como Severe thinness")
         @ValueSource(doubles = {10.0, 15.5, 15.9, 15.99})
