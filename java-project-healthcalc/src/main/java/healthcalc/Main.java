@@ -5,10 +5,9 @@ import healthcalc.exceptions.InvalidHealthDataException;
 
 public class Main {
     public static void main(String[] args) {
-        // 1. Instanciamos tu calculadora
+
         HealthCalc calc = new HealthCalcImpl();
         
-        // 2. Preparamos el scanner para leer del teclado
         Scanner scanner = new Scanner(System.in);
 
       
@@ -21,7 +20,6 @@ public class Main {
             System.out.print("Introduce la Presión Diastólica (PAD): ");
             float pad = scanner.nextFloat();
 
-            // 3. Usamos tus métodos para calcular y clasificar
             float map = calc.calculateMAP(pas, pad);
             String clasificacion = calc.mapClassification(map);
 
@@ -30,10 +28,10 @@ public class Main {
             System.out.println("Clasificación: " + clasificacion);
 
         } catch (InvalidHealthDataException e) {
-            // Este captura tus excepciones personalizadas
+
             System.err.println("\nERROR DE DATOS: " + e.getMessage());
         } catch (Exception e) {
-            // Este captura si el usuario mete texto o algo que no sea un número
+
             System.err.println("\nERROR: Entrada no válida. Por favor, usa números.");
         } finally {
             scanner.close();
