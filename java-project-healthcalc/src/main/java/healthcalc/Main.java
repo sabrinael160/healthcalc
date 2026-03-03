@@ -55,7 +55,7 @@ public class Main {
                 System.out.print("Escriba su sexo (Hombre o Mujer): ");
                 String sexo = scanner.next().toLowerCase(); 
                 double ibw = calculator.ibw(altura, sexo);
-                System.out.println("Su IBW es: " + ibw);
+                System.out.println("Su IBW es: " + ibw + " kg");
             } else {
                 System.out.println("Opción no válida.");
             }

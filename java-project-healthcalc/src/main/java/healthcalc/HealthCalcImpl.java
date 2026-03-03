@@ -68,7 +68,8 @@ public class HealthCalcImpl implements HealthCalc {
 	        weight = (height - 100) - ((height - 150) / 2.5);
         }
         return weight;
-      
+    }
+    
     public float calculateMAP(float pas, float pad) throws InvalidHealthDataException {
 
         if (pas <= 0 || pad <= 0) {
