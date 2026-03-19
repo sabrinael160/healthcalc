@@ -10,7 +10,8 @@ Nivel: Objetivo de usuario
 
 Descripción: El usuario desea obtener el valor de su BMI. Para ello, el usuario debe introducir su peso en kilogramos y su altura en centímetros. La calculadora procesará estos datos y le devolverá al usuario el valor de su BMI junto con su clasificación nutricional correspondiente.
 
-Interesados: * Usuario: Quiere conocer su IMC para evaluar su estado de salud.
+Interesados: 
+    Usuario: Quiere conocer su IMC para evaluar su estado de salud.
 
     Personal Sanitario: Requiere una métrica estandarizada para clasificar el peso.
 
@@ -32,7 +33,7 @@ Escenario principal de éxito:
 
     4.La calculadora comprueba que los datos introducidos son valores numéricos válidos y positivos.
 
-    5.La calculadora aplica la fórmula matemática (BMI=peso/altura2).
+    5.La calculadora aplica la fórmula matemática.
 
     6.La calculadora devuelve el valor del BMI y la clasificación de la OMS al usuario.
 
